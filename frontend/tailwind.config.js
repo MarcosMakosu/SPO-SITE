@@ -29,22 +29,22 @@ module.exports = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#0F766E", // Deep Teal
+          DEFAULT: "#2A4E73", // Brand Blue
           foreground: "#ffffff",
-          50: "#f0fdfa",
-          100: "#ccfbf1",
-          200: "#99f6e4",
-          300: "#5eead4",
-          400: "#2dd4bf",
-          500: "#14b8a6",
-          600: "#0d9488",
-          700: "#0f766e",
-          800: "#115e59",
-          900: "#134e4a",
+          50: "#f0f7ff",
+          100: "#e0effe",
+          200: "#bae0fd",
+          300: "#7cc5fa",
+          400: "#36a9f5",
+          500: "#0c8de4",
+          600: "#026fc2",
+          700: "#2A4E73", // Main brand color
+          800: "#064b85",
+          900: "#0a3f6e",
         },
         secondary: {
-          DEFAULT: "#F0FDFA", // Soft Sage
-          foreground: "#0F766E",
+          DEFAULT: "#F0F7FF", // Very light blue background
+          foreground: "#2A4E73",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -55,7 +55,7 @@ module.exports = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#EA580C", // Burnt Orange
+          DEFAULT: "#EA580C", // Keeping the burnt orange as a complementary accent
           foreground: "#ffffff",
         },
         popover: {

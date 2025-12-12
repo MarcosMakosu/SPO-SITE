@@ -27,11 +27,11 @@ export default function Login() {
 
       const { access_token } = response.data;
       localStorage.setItem("token", access_token);
-      toast.success("Welcome back");
+      toast.success("Bem-vindo de volta");
       navigate("/admin");
     } catch (error) {
       console.error("Login failed", error);
-      toast.error("Invalid credentials");
+      toast.error("Credenciais inválidas");
     } finally {
       setLoading(false);
     }
@@ -44,13 +44,13 @@ export default function Login() {
           <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-6 h-6 text-primary" />
           </div>
-          <h1 className="font-serif text-2xl font-bold text-primary-900">Admin Access</h1>
-          <p className="text-stone-500 text-sm mt-2">Secure login for association administrators</p>
+          <h1 className="font-serif text-2xl font-bold text-primary-900">Acesso Admin</h1>
+          <p className="text-stone-500 text-sm mt-2">Área segura para administradores da S.P.O.</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-2">Email Address</label>
+            <label className="block text-sm font-medium text-stone-700 mb-2">Email</label>
             <input
               type="email"
               required
@@ -63,7 +63,7 @@ export default function Login() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-2">Password</label>
+            <label className="block text-sm font-medium text-stone-700 mb-2">Senha</label>
             <input
               type="password"
               required
@@ -81,12 +81,12 @@ export default function Login() {
             className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-800 transition-colors disabled:opacity-50"
             data-testid="login-submit"
           >
-            {loading ? "Verifying..." : "Sign In"}
+            {loading ? "Verificando..." : "Entrar"}
           </button>
         </form>
         
         <div className="mt-6 text-center text-xs text-stone-400">
-          <p>Protected by end-to-end encryption</p>
+          <p>Protegido por criptografia de ponta a ponta</p>
         </div>
       </div>
     </div>

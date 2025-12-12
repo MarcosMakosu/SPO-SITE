@@ -36,7 +36,7 @@ export default function Admin() {
       const response = await axios.get(`${BACKEND_URL}/api/doctors`);
       setDoctors(response.data);
     } catch (error) {
-      toast.error("Failed to fetch doctors");
+      toast.error("Falha ao buscar médicos");
     } finally {
       setLoading(false);
     }
@@ -54,10 +54,10 @@ export default function Admin() {
       
       if (editingDoctor) {
         await axios.put(`${BACKEND_URL}/api/doctors/${editingDoctor.id}`, formData, { headers });
-        toast.success("Doctor updated successfully");
+        toast.success("Médico atualizado com sucesso");
       } else {
         await axios.post(`${BACKEND_URL}/api/doctors`, formData, { headers });
-        toast.success("Doctor added successfully");
+        toast.success("Médico adicionado com sucesso");
       }
       
       setShowModal(false);
@@ -66,20 +66,20 @@ export default function Admin() {
       fetchDoctors();
     } catch (error) {
       console.error(error);
-      toast.error("Operation failed");
+      toast.error("Operação falhou");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
+    if (!window.confirm("Tem certeza que deseja excluir?")) return;
     try {
       await axios.delete(`${BACKEND_URL}/api/doctors/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success("Doctor removed");
+      toast.success("Médico removido");
       fetchDoctors();
     } catch (error) {
-      toast.error("Failed to delete");
+      toast.error("Falha ao excluir");
     }
   };
 
@@ -104,8 +104,8 @@ export default function Admin() {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-serif text-3xl text-primary-900">Admin Dashboard</h1>
-          <p className="text-stone-500">Manage directory entries</p>
+          <h1 className="font-serif text-3xl text-primary-900">Painel Admin</h1>
+          <p className="text-stone-500">Gerenciar diretório de associados</p>
         </div>
         <div className="flex gap-4">
           <button 
@@ -113,14 +113,14 @@ export default function Admin() {
             className="bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary-800 transition-colors flex items-center gap-2"
             data-testid="add-doctor-btn"
           >
-            <Plus className="w-4 h-4" /> Add Doctor
+            <Plus className="w-4 h-4" /> Adicionar
           </button>
           <button 
             onClick={handleLogout}
             className="bg-stone-100 text-stone-600 px-4 py-2 rounded-full font-medium hover:bg-stone-200 transition-colors flex items-center gap-2"
             data-testid="logout-btn"
           >
-            <LogOut className="w-4 h-4" /> Logout
+            <LogOut className="w-4 h-4" /> Sair
           </button>
         </div>
       </div>
@@ -130,10 +130,10 @@ export default function Admin() {
           <table className="w-full text-left">
             <thead className="bg-stone-50 border-b border-stone-100">
               <tr>
-                <th className="px-6 py-4 font-serif font-semibold text-primary-900">Name</th>
-                <th className="px-6 py-4 font-serif font-semibold text-primary-900">Specialty</th>
-                <th className="px-6 py-4 font-serif font-semibold text-primary-900">City</th>
-                <th className="px-6 py-4 font-serif font-semibold text-primary-900">Actions</th>
+                <th className="px-6 py-4 font-serif font-semibold text-primary-900">Nome</th>
+                <th className="px-6 py-4 font-serif font-semibold text-primary-900">Especialidade</th>
+                <th className="px-6 py-4 font-serif font-semibold text-primary-900">Cidade</th>
+                <th className="px-6 py-4 font-serif font-semibold text-primary-900">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
@@ -146,14 +146,14 @@ export default function Admin() {
                     <button 
                       onClick={() => openEdit(doc)}
                       className="p-2 text-stone-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
-                      title="Edit"
+                      title="Editar"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleDelete(doc.id)}
                       className="p-2 text-stone-400 hover:text-destructive hover:bg-destructive/10 rounded-full transition-colors"
-                      title="Delete"
+                      title="Excluir"
                       data-testid={`delete-doctor-${doc.id}`}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function Admin() {
               {doctors.length === 0 && !loading && (
                 <tr>
                   <td colSpan="4" className="px-6 py-12 text-center text-stone-400">
-                    No doctors found. Add one to get started.
+                    Nenhum médico encontrado. Adicione um para começar.
                   </td>
                 </tr>
               )}
@@ -178,52 +178,52 @@ export default function Admin() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl animate-in fade-in zoom-in duration-200">
             <h2 className="font-serif text-2xl font-bold text-primary-900 mb-6">
-              {editingDoctor ? "Edit Doctor" : "Add New Doctor"}
+              {editingDoctor ? "Editar Médico" : "Novo Médico"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-stone-700 mb-1">Nome Completo</label>
                 <input
                   required
                   className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  placeholder="Dr. Sarah Smith"
+                  placeholder="Dr. Silva"
                   data-testid="input-name"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-1">Specialty</label>
+                  <label className="block text-sm font-medium text-stone-700 mb-1">Especialidade</label>
                   <input
                     required
                     className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                     value={formData.specialty}
                     onChange={(e) => setFormData({...formData, specialty: e.target.value})}
-                    placeholder="Cardiology"
+                    placeholder="Oftalmologia"
                     data-testid="input-specialty"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-1">City</label>
+                  <label className="block text-sm font-medium text-stone-700 mb-1">Cidade</label>
                   <input
                     required
                     className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                     value={formData.city}
                     onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    placeholder="New York"
+                    placeholder="Belém"
                     data-testid="input-city"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">Contact Info</label>
+                <label className="block text-sm font-medium text-stone-700 mb-1">Contato</label>
                 <input
                   required
                   className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                   value={formData.contact_info}
                   onChange={(e) => setFormData({...formData, contact_info: e.target.value})}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="(91) 98888-8888"
                   data-testid="input-contact"
                 />
               </div>
@@ -234,14 +234,14 @@ export default function Admin() {
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-2 border border-stone-200 text-stone-600 rounded-lg hover:bg-stone-50 transition-colors"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-800 transition-colors"
                   data-testid="submit-doctor"
                 >
-                  {editingDoctor ? "Save Changes" : "Add Doctor"}
+                  {editingDoctor ? "Salvar" : "Adicionar"}
                 </button>
               </div>
             </form>

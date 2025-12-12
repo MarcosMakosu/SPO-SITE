@@ -20,7 +20,7 @@ export default function Directory() {
       setDoctors(response.data);
     } catch (error) {
       console.error("Error fetching doctors:", error);
-      toast.error("Failed to load directory");
+      toast.error("Erro ao carregar diretório");
     } finally {
       setLoading(false);
     }
@@ -38,9 +38,9 @@ export default function Directory() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="text-center mb-16">
-        <h1 className="font-serif text-4xl md:text-6xl text-primary-900 mb-6">Find a Specialist</h1>
+        <h1 className="font-serif text-4xl md:text-6xl text-primary-900 mb-6">Encontre um Especialista</h1>
         <p className="text-lg text-stone-500 max-w-2xl mx-auto">
-          Search our comprehensive directory of verified medical professionals by city.
+          Busque em nosso diretório completo de profissionais de oftalmologia verificados.
         </p>
       </div>
 
@@ -52,8 +52,8 @@ export default function Directory() {
           </div>
           <input
             type="text"
-            placeholder="Search by city (e.g. New York)"
-            className="block w-full pl-12 pr-4 py-4 bg-white border border-stone-200 rounded-full text-lg shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-stone-400"
+            placeholder="Buscar por cidade (ex: Belém)"
+            className="block w-full pl-12 pr-32 py-4 bg-white border border-stone-200 rounded-full text-lg shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-stone-400"
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
             data-testid="city-search-input"
@@ -63,7 +63,7 @@ export default function Directory() {
             className="absolute right-2 top-2 bottom-2 bg-primary text-white px-6 rounded-full font-medium hover:bg-primary-800 transition-colors"
             data-testid="search-button"
           >
-            Search
+            Buscar
           </button>
         </form>
       </div>
@@ -77,12 +77,12 @@ export default function Directory() {
         </div>
       ) : doctors.length === 0 ? (
         <div className="text-center py-20 bg-stone-50 rounded-3xl border border-stone-100">
-          <p className="text-stone-500 text-lg">No doctors found matching your criteria.</p>
+          <p className="text-stone-500 text-lg">Nenhum médico encontrado com estes critérios.</p>
           <button 
             onClick={() => {setCityFilter(""); fetchDoctors("");}}
             className="mt-4 text-primary font-medium hover:underline"
           >
-            Clear filters
+            Limpar filtros
           </button>
         </div>
       ) : (
@@ -104,7 +104,7 @@ function DoctorCard({ doctor }) {
           {doctor.name.charAt(0)}
         </div>
         <div className="bg-stone-50 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-stone-500">
-          Verified
+          Verificado
         </div>
       </div>
       
