@@ -1,0 +1,31 @@
+{
+  "total_tests": 4,
+  "passed_tests": 2,
+  "success_rate": 50.0,
+  "results": [
+    {
+      "test": "Admin Login",
+      "success": false,
+      "details": "Expected 200, got 422 - {'detail': [{'type': 'missing', 'loc': ['body', 'username'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'missing', 'loc': ['body', 'password'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
+      "timestamp": "2025-12-12T21:15:09.691433"
+    },
+    {
+      "test": "Admin Login (Form Data)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:10.018020"
+    },
+    {
+      "test": "Get Doctors (Empty)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:10.062590"
+    },
+    {
+      "test": "Create Doctor",
+      "success": false,
+      "details": "Expected 201, got 200 - {'name': 'Dr. House', 'city': 'Princeton', 'specialty': 'Diagnostics', 'contact_info': '555-0199', 'image_url': None, 'id': 'e144ddee-a003-486b-90bb-e6f6b76eadb4', 'created_at': '2025-12-12T21:15:10.099451Z'}",
+      "timestamp": "2025-12-12T21:15:10.156708"
+    }
+  ]
+}
