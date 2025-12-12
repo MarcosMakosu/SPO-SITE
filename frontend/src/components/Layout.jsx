@@ -12,23 +12,23 @@ export default function Layout() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navigation - Fixed Square Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-stone-100 shadow-sm h-20 transition-all">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-stone-100 shadow-sm h-24 transition-all">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between">
           <Link to="/" className="flex items-center gap-4 group">
             {/* Logo - Free shape, larger */}
             <img 
-              src="https://customer-assets.emergentagent.com/job_6e125dd0-724d-42ad-90c4-2b3d56d9357e/artifacts/cf3fmqvu_IMG-20251201-WA0116.jpg" 
+              src="https://customer-assets.emergentagent.com/job_6e125dd0-724d-42ad-90c4-2b3d56d9357e/artifacts/t3f91lft_corte-removebg-preview.png" 
               alt="Logo Sociedade Paraense de Oftalmologia" 
-              className="h-12 w-auto object-contain md:h-14 transition-transform group-hover:scale-105"
+              className="h-16 w-auto object-contain md:h-20 transition-transform group-hover:scale-105"
             />
-            <div className="flex flex-col">
-              <span className="font-serif font-bold text-lg md:text-xl text-primary-900 leading-none hidden md:block">
+            <div className="flex flex-col justify-center">
+              <span className="font-serif font-bold text-lg md:text-xl text-[#637685] leading-none hidden md:block">
                 Sociedade Paraense
               </span>
-              <span className="font-serif font-bold text-lg md:text-xl text-primary-900 leading-none hidden md:block">
+              <span className="font-serif font-bold text-lg md:text-xl text-[#637685] leading-none hidden md:block">
                  de Oftalmologia
               </span>
-              <span className="font-serif font-bold text-lg text-primary-900 leading-tight md:hidden">
+              <span className="font-serif font-bold text-lg text-[#637685] leading-tight md:hidden">
                 S.P.O.
               </span>
             </div>
@@ -54,16 +54,16 @@ export default function Layout() {
 
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden p-2 text-primary-900 hover:bg-stone-50 rounded-lg"
+            className="md:hidden p-2 text-[#637685] hover:bg-stone-50 rounded-lg"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-             {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+             {mobileMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
           </button>
         </div>
 
         {/* Mobile Nav Dropdown */}
         {mobileMenuOpen && (
-           <div className="absolute top-20 left-0 right-0 bg-white border-b border-stone-100 shadow-xl p-4 flex flex-col gap-2 md:hidden animate-in slide-in-from-top-2 duration-200">
+           <div className="absolute top-24 left-0 right-0 bg-white border-b border-stone-100 shadow-xl p-4 flex flex-col gap-2 md:hidden animate-in slide-in-from-top-2 duration-200">
              <Link 
                to="/" 
                className={cn("px-4 py-4 rounded-lg font-medium text-lg", isActive("/") ? "bg-primary/5 text-primary" : "text-stone-600")}
@@ -89,8 +89,8 @@ export default function Layout() {
         )}
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-grow pt-28 pb-12 px-4 md:px-6">
+      {/* Main Content - Adjusted padding for taller header */}
+      <main className="flex-grow pt-32 pb-12 px-4 md:px-6">
         <Outlet />
       </main>
 
@@ -98,7 +98,7 @@ export default function Layout() {
       <footer className="bg-white border-t border-stone-100 py-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
-            <h3 className="font-serif font-bold text-lg text-primary-900">Sociedade Paraense de Oftalmologia</h3>
+            <h3 className="font-serif font-bold text-lg text-[#637685]">Sociedade Paraense de Oftalmologia</h3>
             <p className="text-stone-500 text-sm mt-2">Promovendo a saúde ocular no Pará.</p>
           </div>
           <div className="text-stone-400 text-sm">
@@ -117,8 +117,8 @@ function NavLink({ to, children, active }) {
       className={cn(
         "px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
         active 
-          ? "text-primary font-bold bg-primary/5" 
-          : "text-stone-600 hover:text-primary hover:bg-stone-50"
+          ? "text-[#637685] font-bold bg-stone-100" 
+          : "text-stone-500 hover:text-[#637685] hover:bg-stone-50"
       )}
     >
       {children}
