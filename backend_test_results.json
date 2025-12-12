@@ -1,31 +1,67 @@
 {
-  "total_tests": 4,
-  "passed_tests": 2,
-  "success_rate": 50.0,
+  "total_tests": 10,
+  "passed_tests": 8,
+  "success_rate": 80.0,
   "results": [
     {
       "test": "Admin Login",
       "success": false,
       "details": "Expected 200, got 422 - {'detail': [{'type': 'missing', 'loc': ['body', 'username'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'missing', 'loc': ['body', 'password'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
-      "timestamp": "2025-12-12T21:15:09.691433"
+      "timestamp": "2025-12-12T21:15:25.745556"
     },
     {
       "test": "Admin Login (Form Data)",
       "success": true,
       "details": "",
-      "timestamp": "2025-12-12T21:15:10.018020"
+      "timestamp": "2025-12-12T21:15:26.008783"
     },
     {
       "test": "Get Doctors (Empty)",
       "success": true,
       "details": "",
-      "timestamp": "2025-12-12T21:15:10.062590"
+      "timestamp": "2025-12-12T21:15:26.049941"
     },
     {
       "test": "Create Doctor",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:26.094221"
+    },
+    {
+      "test": "Get Doctors (With Data)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:26.132823"
+    },
+    {
+      "test": "Search Doctors by City",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:26.173397"
+    },
+    {
+      "test": "Update Doctor",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:26.215873"
+    },
+    {
+      "test": "Delete Doctor",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:26.255157"
+    },
+    {
+      "test": "Verify Doctor Deleted",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-12T21:15:26.294289"
+    },
+    {
+      "test": "Verify Doctor Deleted",
       "success": false,
-      "details": "Expected 201, got 200 - {'name': 'Dr. House', 'city': 'Princeton', 'specialty': 'Diagnostics', 'contact_info': '555-0199', 'image_url': None, 'id': 'e144ddee-a003-486b-90bb-e6f6b76eadb4', 'created_at': '2025-12-12T21:15:10.099451Z'}",
-      "timestamp": "2025-12-12T21:15:10.156708"
+      "details": "Doctor still exists",
+      "timestamp": "2025-12-12T21:15:26.294950"
     }
   ]
 }
