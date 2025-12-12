@@ -138,16 +138,19 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 # Routes - Doctors
 @api_router.get("/doctors", response_model=List[Doctor])
-async def get_doctors(city: Optional[str] = None, specialty: Optional[str] = None):
+async def get_doctors(
+    city: Optional[str] = None, 
+    specialty: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 100
+):
     query = {}
     if city:
         query["city"] = {"$regex": city, "$options": "i"}
     if specialty:
         query["specialty"] = {"$regex": specialty, "$options": "i"}
         
-    doctors = await db.doctors.find(query, {"_id": 0}).to_list(1000)
-    # Convert dates to ISO strings if needed, but Pydantic handles datetime -> ISO automatically in JSON response
-    # However, we must ensure we are returning clean dicts matching the model
+    doctors = await db.doctors.find(query, {"_id": 0}).skip(skip).to_list(limit)
     return doctors
 
 @api_router.post("/doctors", response_model=Doctor, status_code=status.HTTP_201_CREATED)
