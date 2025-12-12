@@ -150,7 +150,7 @@ async def get_doctors(city: Optional[str] = None, specialty: Optional[str] = Non
     # However, we must ensure we are returning clean dicts matching the model
     return doctors
 
-@api_router.post("/doctors", response_model=Doctor)
+@api_router.post("/doctors", response_model=Doctor, status_code=status.HTTP_201_CREATED)
 async def create_doctor(doctor: DoctorCreate, current_user: User = Depends(get_current_user)):
     doc_data = doctor.model_dump()
     new_doctor = Doctor(**doc_data)
