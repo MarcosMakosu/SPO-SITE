@@ -10,7 +10,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-primary-900/95 to-primary-800/80"></div>
         
         <div className="relative z-10 max-w-3xl">
-          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-light mb-6 leading-[1.1]">
+          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-light mb-6 leading-[1.1] text-white">
             Excelência em <br/>
             <span className="font-semibold text-white">Oftalmologia no Pará</span>
           </h1>
