@@ -12,7 +12,7 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-light mb-6 leading-[1.1]">
             Excelência em <br/>
-            <span className="font-semibold text-accent-100">Oftalmologia no Pará</span>
+            <span className="font-semibold text-white">Oftalmologia no Pará</span>
           </h1>
           <p className="text-lg md:text-xl text-primary-100 mb-10 leading-relaxed max-w-2xl">
             A Sociedade Paraense de Oftalmologia conecta você aos especialistas mais qualificados da região, garantindo o mais alto padrão de cuidado com sua visão.
