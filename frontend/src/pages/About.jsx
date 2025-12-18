@@ -26,7 +26,7 @@ export default function About() {
         </div>
         <div className="grid grid-cols-2 gap-4">
            <img 
-             src="https://images.unsplash.com/photo-1583912267655-731b54a2a4b0?auto=format&fit=crop&q=80&w=600" 
+             src="https://images.unsplash.com/photo-1579165466949-3180a3d056d5?auto=format&fit=crop&q=80&w=600" 
              className="rounded-2xl shadow-lg w-full h-64 object-cover -translate-y-4" 
              alt="Equipamento oftalmológico moderno"
            />
