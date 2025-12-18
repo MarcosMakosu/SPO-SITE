@@ -1,12 +1,16 @@
 import asyncio
 import os
-from motor.motor_asyncio import AsyncIOMotorClient
-from datetime import datetime, timezone
 import uuid
+from datetime import datetime, timezone
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select, delete
 
-# Configuration
-MONGO_URL = os.environ.get('MONGO_URL', "mongodb://localhost:27017")
-DB_NAME = os.environ.get('DB_NAME', "test_database")
+# Import models from server (assuming server.py is in the parent path or python path is set)
+# To make this robust, we define a minimal version or import
+import sys
+sys.path.append("/app/backend")
+from server import DoctorModel, Base, engine, AsyncSessionLocal
 
 doctors_data = [
     {
@@ -47,25 +51,35 @@ doctors_data = [
 ]
 
 async def seed():
-    print(f"Connecting to {MONGO_URL}...")
-    client = AsyncIOMotorClient(MONGO_URL)
-    db = client[DB_NAME]
+    print("Starting seed for SQLite...")
     
-    # Clear existing doctors
-    print("Clearing existing doctors...")
-    await db.doctors.delete_many({})
-    
-    # Insert new doctors
-    print("Inserting new doctors...")
-    for doc in doctors_data:
-        doc_db = doc.copy()
-        doc_db["id"] = str(uuid.uuid4())
-        doc_db["created_at"] = datetime.now(timezone.utc).isoformat()
-        await db.doctors.insert_one(doc_db)
-        print(f"Added: {doc['name']}")
+    # Create tables if they don't exist
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with AsyncSessionLocal() as session:
+        # Clear existing
+        print("Clearing existing doctors...")
+        await session.execute(delete(DoctorModel))
         
+        # Insert new
+        print("Inserting new doctors...")
+        for doc in doctors_data:
+            new_doc = DoctorModel(
+                id=str(uuid.uuid4()),
+                name=doc["name"],
+                city=doc["city"],
+                specialty=doc["specialty"],
+                contact_info=doc["contact_info"],
+                image_url=doc["image_url"],
+                created_at=datetime.utcnow()
+            )
+            session.add(new_doc)
+            print(f"Added: {doc['name']}")
+        
+        await session.commit()
+    
     print("Seed complete!")
-    client.close()
 
 if __name__ == "__main__":
     asyncio.run(seed())
