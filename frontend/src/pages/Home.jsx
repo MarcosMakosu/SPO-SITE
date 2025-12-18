@@ -5,13 +5,13 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto space-y-24">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-primary-900 text-white py-20 px-8 md:px-16 md:py-32">
+      <section className="relative overflow-hidden rounded-3xl bg-primary-900 text-white py-12 px-6 md:px-16 md:py-32">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1579684385180-1ea55f6196e0?crop=entropy&cs=srgb&fm=jpg&q=85')] opacity-20 bg-cover bg-center mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-primary-900/95 to-primary-800/80"></div>
         
         <div className="relative z-10 max-w-3xl">
-          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-light mb-6 leading-[1.1] text-white">
-            Excelência em <br/>
+          <h1 className="font-serif text-3xl md:text-6xl lg:text-7xl font-light mb-6 leading-tight md:leading-[1.1] text-white break-words">
+            Excelência em <br className="hidden md:block"/>
             <span className="font-semibold text-white">Oftalmologia no Pará</span>
           </h1>
           <p className="text-lg md:text-xl text-primary-100 mb-10 leading-relaxed max-w-2xl">
