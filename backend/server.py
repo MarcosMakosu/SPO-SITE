@@ -116,6 +116,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 # App Init
 app = FastAPI()
 
+# Mount uploads directory
+app.mount("/uploads", StaticFiles(directory=os.path.join(ROOT_DIR, "uploads")), name="uploads")
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
