@@ -37,7 +37,19 @@ export default function Layout() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-2">
             <NavLink to="/" active={isActive("/")}>Início</NavLink>
+            <NavLink to="/about" active={isActive("/about")}>Sobre a S.P.O.</NavLink>
             <NavLink to="/directory" active={isActive("/directory")}>Diretório</NavLink>
+            <Link 
+              to="/join"
+              className={cn(
+                "px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border",
+                isActive("/join") 
+                  ? "bg-primary text-white border-primary" 
+                  : "bg-white text-primary border-primary hover:bg-primary/5"
+              )}
+            >
+              Se Associe
+            </Link>
             <Link 
               to="/admin" 
               className={cn(
@@ -72,11 +84,25 @@ export default function Layout() {
                Início
              </Link>
              <Link 
+               to="/about" 
+               className={cn("px-4 py-4 rounded-lg font-medium text-lg", isActive("/about") ? "bg-primary/5 text-primary" : "text-stone-600")}
+               onClick={() => setMobileMenuOpen(false)}
+             >
+               Sobre a S.P.O.
+             </Link>
+             <Link 
                to="/directory" 
                className={cn("px-4 py-4 rounded-lg font-medium text-lg", isActive("/directory") ? "bg-primary/5 text-primary" : "text-stone-600")}
                onClick={() => setMobileMenuOpen(false)}
              >
                Diretório
+             </Link>
+             <Link 
+               to="/join" 
+               className={cn("px-4 py-4 rounded-lg font-medium text-lg text-primary bg-primary/5", isActive("/join") ? "bg-primary/10" : "")}
+               onClick={() => setMobileMenuOpen(false)}
+             >
+               Se Associe
              </Link>
              <Link 
                to="/admin" 

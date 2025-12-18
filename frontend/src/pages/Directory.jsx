@@ -70,9 +70,9 @@ export default function Directory() {
 
       {/* Results Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-64 bg-stone-100 rounded-2xl animate-pulse"></div>
+            <div key={i} className="h-96 bg-stone-100 rounded-2xl animate-pulse"></div>
           ))}
         </div>
       ) : doctors.length === 0 ? (
@@ -86,7 +86,7 @@ export default function Directory() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {doctors.map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
           ))}
@@ -98,34 +98,46 @@ export default function Directory() {
 
 function DoctorCard({ doctor }) {
   return (
-    <div className="group bg-white border border-stone-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full" data-testid={`doctor-card-${doctor.id}`}>
-      <div className="flex items-start justify-between mb-6">
-        <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center text-primary font-serif font-bold text-2xl shrink-0">
-          {doctor.name.charAt(0)}
-        </div>
-        <div className="bg-stone-50 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-stone-500">
-          Verificado
+    <div className="group bg-white border border-stone-100 rounded-3xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full" data-testid={`doctor-card-${doctor.id}`}>
+      {/* Large Image Section */}
+      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-stone-100">
+        {doctor.image_url ? (
+          <img 
+            src={doctor.image_url} 
+            alt={doctor.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-secondary/30 text-primary/30">
+            <Stethoscope className="w-20 h-20" />
+          </div>
+        )}
+        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-primary border border-white/20 shadow-sm">
+          S.P.O. Membro
         </div>
       </div>
       
-      <div className="mb-6">
-        <h3 className="font-serif text-xl font-bold text-primary-900 mb-1 group-hover:text-primary transition-colors">
+      <div className="px-2 pb-2 flex-grow flex flex-col">
+        <h3 className="font-serif text-2xl font-bold text-primary-900 mb-2 group-hover:text-primary transition-colors">
           {doctor.name}
         </h3>
-        <div className="flex items-center gap-2 text-accent font-medium text-sm mb-3">
-          <Stethoscope className="w-4 h-4" />
-          {doctor.specialty}
+        
+        <div className="space-y-3 mb-6">
+          <div className="flex items-center gap-2 text-accent font-medium text-base">
+            <Stethoscope className="w-5 h-5 shrink-0" />
+            {doctor.specialty}
+          </div>
+          <div className="flex items-center gap-2 text-stone-500 text-sm">
+            <MapPin className="w-5 h-5 shrink-0" />
+            {doctor.city}
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-stone-500 text-sm">
-          <MapPin className="w-4 h-4" />
-          {doctor.city}
-        </div>
-      </div>
 
-      <div className="mt-auto pt-6 border-t border-stone-100 space-y-3">
-        <div className="flex items-center gap-3 text-sm text-stone-600">
-          <Phone className="w-4 h-4 text-stone-400" />
-          {doctor.contact_info}
+        <div className="mt-auto pt-5 border-t border-stone-100">
+          <div className="flex items-center gap-3 text-sm text-stone-700 font-medium bg-stone-50 p-3 rounded-xl">
+            <Phone className="w-4 h-4 text-primary shrink-0" />
+            {doctor.contact_info}
+          </div>
         </div>
       </div>
     </div>

@@ -5,6 +5,8 @@ import Home from "./pages/Home";
 import Directory from "./pages/Directory";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import About from "./pages/About";
+import Join from "./pages/Join";
 import { useEffect } from "react";
 
 function ScrollToTop() {
@@ -25,7 +27,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="about" element={<About />} />
             <Route path="directory" element={<Directory />} />
+            <Route path="join" element={<Join />} />
             <Route path="login" element={<Login />} />
             <Route path="admin" element={<Admin />} />
           </Route>
