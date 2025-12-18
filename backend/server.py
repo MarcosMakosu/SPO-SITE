@@ -40,8 +40,9 @@ UPLOAD_DIR = os.path.join(ROOT_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # 2. Database Setup (SQLite + SQLAlchemy)
-# Using a file-based SQLite database
-DATABASE_URL = "sqlite+aiosqlite:///./medassoc.db"
+# Using a file-based SQLite database with absolute path
+DB_PATH = os.path.join(ROOT_DIR, "medassoc.db")
+DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
