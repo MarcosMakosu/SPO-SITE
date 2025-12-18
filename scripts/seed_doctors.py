@@ -1,16 +1,14 @@
 import asyncio
-import os
-import uuid
-from datetime import datetime, timezone
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import select, delete
-
-# Import models from server (assuming server.py is in the parent path or python path is set)
-# To make this robust, we define a minimal version or import
 import sys
+import os
+
+# Ensure backend path is in sys.path
 sys.path.append("/app/backend")
-from server import DoctorModel, Base, engine, AsyncSessionLocal
+
+# Now we can import from server
+# We need to make sure we don't trigger the whole app startup if possible, 
+# but server.py does `app = FastAPI()` at module level. That's fine.
+from server import DoctorModel, AsyncSessionLocal, engine
 
 doctors_data = [
     {
@@ -51,35 +49,26 @@ doctors_data = [
 ]
 
 async def seed():
-    print("Starting seed for SQLite...")
-    
-    # Create tables if they don't exist
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
+    print("Seeding doctors...")
     async with AsyncSessionLocal() as session:
-        # Clear existing
-        print("Clearing existing doctors...")
+        # Check if we already have doctors
+        # Note: In a real script we might want to truncate, but here let's just add if empty or append
+        # Let's clean up for demo purposes
+        from sqlalchemy import delete
         await session.execute(delete(DoctorModel))
         
-        # Insert new
-        print("Inserting new doctors...")
         for doc in doctors_data:
             new_doc = DoctorModel(
-                id=str(uuid.uuid4()),
                 name=doc["name"],
                 city=doc["city"],
                 specialty=doc["specialty"],
                 contact_info=doc["contact_info"],
-                image_url=doc["image_url"],
-                created_at=datetime.utcnow()
+                image_url=doc["image_url"]
             )
             session.add(new_doc)
-            print(f"Added: {doc['name']}")
         
         await session.commit()
-    
-    print("Seed complete!")
+    print("Seed complete.")
 
 if __name__ == "__main__":
     asyncio.run(seed())
