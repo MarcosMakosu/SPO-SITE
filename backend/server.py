@@ -116,6 +116,30 @@ class DoctorResponse(DoctorCreate):
     
     model_config = ConfigDict(from_attributes=True)
 
+class EventCreate(BaseModel):
+    title: str
+    date: str
+    time: str
+    location: str
+    description: str
+    image_url: Optional[str] = None
+    status: str
+
+class EventUpdate(BaseModel):
+    title: Optional[str] = None
+    date: Optional[str] = None
+    time: Optional[str] = None
+    location: Optional[str] = None
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    status: Optional[str] = None
+
+class EventResponse(EventCreate):
+    id: str
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+
 # 4. Auth & Security Logic
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
