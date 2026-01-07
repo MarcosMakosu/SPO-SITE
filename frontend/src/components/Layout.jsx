@@ -38,6 +38,7 @@ export default function Layout() {
           <div className="hidden md:flex items-center gap-2">
             <NavLink to="/" active={isActive("/")}>Início</NavLink>
             <NavLink to="/about" active={isActive("/about")}>Sobre a S.P.O.</NavLink>
+            <NavLink to="/events" active={isActive("/events")}>Eventos</NavLink>
             <NavLink to="/directory" active={isActive("/directory")}>Diretório</NavLink>
             <Link 
               to="/join"
