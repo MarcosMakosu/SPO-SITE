@@ -367,6 +367,10 @@ export default function Admin() {
                     <label className="block text-sm font-medium text-stone-700 mb-1">Localização</label>
                     <input required className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg outline-none" value={formData.location || ""} onChange={(e) => setFormData({...formData, location: e.target.value})} placeholder="Auditório X" />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 mb-1">Link "Saiba Mais"</label>
+                    <input required className="w-full px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg outline-none" value={formData.external_link || ""} onChange={(e) => setFormData({...formData, external_link: e.target.value})} placeholder="https://..." />
+                  </div>
                    <div>
                     <label className="block text-sm font-medium text-stone-700 mb-1">Status</label>
                     <select 
