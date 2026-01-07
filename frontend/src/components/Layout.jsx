@@ -92,6 +92,13 @@ export default function Layout() {
                Sobre a S.P.O.
              </Link>
              <Link 
+               to="/events" 
+               className={cn("px-4 py-4 rounded-lg font-medium text-lg", isActive("/events") ? "bg-primary/5 text-primary" : "text-stone-600")}
+               onClick={() => setMobileMenuOpen(false)}
+             >
+               Eventos
+             </Link>
+             <Link 
                to="/directory" 
                className={cn("px-4 py-4 rounded-lg font-medium text-lg", isActive("/directory") ? "bg-primary/5 text-primary" : "text-stone-600")}
                onClick={() => setMobileMenuOpen(false)}
