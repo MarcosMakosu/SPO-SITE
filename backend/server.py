@@ -124,6 +124,7 @@ class EventCreate(BaseModel):
     location: str
     description: str
     image_url: Optional[str] = None
+    external_link: Optional[str] = None
     status: str
 
 class EventUpdate(BaseModel):
@@ -133,6 +134,7 @@ class EventUpdate(BaseModel):
     location: Optional[str] = None
     description: Optional[str] = None
     image_url: Optional[str] = None
+    external_link: Optional[str] = None
     status: Optional[str] = None
 
 class EventResponse(EventCreate):
