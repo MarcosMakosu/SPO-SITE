@@ -77,6 +77,7 @@ class EventModel(Base):
     location = Column(String)
     description = Column(String)
     image_url = Column(String, nullable=True)
+    external_link = Column(String, nullable=True)
     status = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
