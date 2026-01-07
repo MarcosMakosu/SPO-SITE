@@ -68,6 +68,18 @@ class DoctorModel(Base):
     image_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class EventModel(Base):
+    __tablename__ = "events"
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    title = Column(String)
+    date = Column(String)
+    time = Column(String)
+    location = Column(String)
+    description = Column(String)
+    image_url = Column(String, nullable=True)
+    status = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 # Dependency to get DB session
 async def get_db():
     async with AsyncSessionLocal() as session:
