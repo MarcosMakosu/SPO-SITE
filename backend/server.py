@@ -288,6 +288,62 @@ async def create_doctor(
     new_doctor = DoctorModel(**doctor.model_dump())
     db.add(new_doctor)
     await db.commit()
+# Events (CRUD)
+@api_router.get("/events", response_model=List[EventResponse])
+async def get_events(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(EventModel).order_by(EventModel.created_at.desc()))
+    events = result.scalars().all()
+    return events
+
+@api_router.post("/events", response_model=EventResponse, status_code=status.HTTP_201_CREATED)
+async def create_event(
+    event: EventCreate, 
+    current_user: UserModel = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    new_event = EventModel(**event.model_dump())
+    db.add(new_event)
+    await db.commit()
+    await db.refresh(new_event)
+    return new_event
+
+@api_router.put("/events/{event_id}", response_model=EventResponse)
+async def update_event(
+    event_id: str, 
+    event_update: EventUpdate, 
+    current_user: UserModel = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(EventModel).where(EventModel.id == event_id))
+    event_db = result.scalars().first()
+    
+    if not event_db:
+        raise HTTPException(status_code=404, detail="Event not found")
+        
+    update_data = event_update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(event_db, key, value)
+        
+    await db.commit()
+    await db.refresh(event_db)
+    return event_db
+
+@api_router.delete("/events/{event_id}")
+async def delete_event(
+    event_id: str, 
+    current_user: UserModel = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(EventModel).where(EventModel.id == event_id))
+    event_db = result.scalars().first()
+    
+    if not event_db:
+        raise HTTPException(status_code=404, detail="Event not found")
+        
+    await db.delete(event_db)
+    await db.commit()
+    return {"message": "Event deleted successfully"}
+
     await db.refresh(new_doctor)
     return new_doctor
 
