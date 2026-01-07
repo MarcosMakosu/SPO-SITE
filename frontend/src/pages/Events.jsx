@@ -1,38 +1,28 @@
-import { Calendar, MapPin, Clock, ArrowRight, ExternalLink } from "lucide-react";
+import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function Events() {
-  const events = [
-    {
-      id: 1,
-      title: "V Congresso Paraense de Oftalmologia",
-      date: "15-17 de Outubro, 2025",
-      time: "08:00 - 18:00",
-      location: "Hangar Centro de Convenções, Belém",
-      description: "O maior evento da oftalmologia no norte do país. Três dias de imersão científica, workshops práticos e networking com grandes nomes nacionais.",
-      image: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80&w=800",
-      status: "Inscrições Abertas"
-    },
-    {
-      id: 2,
-      title: "Curso Avançado de Retina e Vítreo",
-      date: "22 de Novembro, 2025",
-      time: "09:00 - 17:00",
-      location: "Auditório da S.P.O.",
-      description: "Curso teórico-prático focado nas novas tecnologias de diagnóstico e tratamento de doenças retinianas. Vagas limitadas.",
-      image: "https://images.unsplash.com/photo-1576091160550-2187d80a18f7?auto=format&fit=crop&q=80&w=800",
-      status: "Poucas Vagas"
-    },
-    {
-      id: 3,
-      title: "Mutirão de Prevenção ao Glaucoma",
-      date: "05 de Dezembro, 2025",
-      time: "08:00 - 14:00",
-      location: "Praça da República",
-      description: "Ação social aberta ao público para aferição de pressão intraocular e triagem de glaucoma. Participe como voluntário.",
-      image: "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=800",
-      status: "Gratuito"
-    }
-  ];
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${BACKEND_URL}/api/events`);
+        setEvents(response.data);
+      } catch (error) {
+        console.error("Error fetching events", error);
+        toast.error("Erro ao carregar eventos");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto space-y-16">
@@ -51,30 +41,19 @@ export default function Events() {
 
       {/* Events List */}
       <div className="grid gap-8">
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </div>
-
-      {/* Newsletter / Stay Updated */}
-      <div className="bg-primary-900 rounded-3xl p-8 md:p-16 text-center text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=1200')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
-        <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-           <h2 className="font-serif text-3xl font-bold text-white">Não perca nenhuma novidade</h2>
-           <p className="text-primary-100 text-lg">
-             Inscreva-se em nossa newsletter para receber avisos sobre novos cursos e abertura de inscrições para congressos.
-           </p>
-           <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-             <input 
-               type="email" 
-               placeholder="Seu melhor e-mail" 
-               className="flex-grow px-6 py-4 rounded-full text-stone-900 focus:outline-none focus:ring-2 focus:ring-accent"
-             />
-             <button className="bg-accent text-white px-8 py-4 rounded-full font-bold hover:bg-accent/90 transition-colors">
-               Inscrever
-             </button>
+        {loading ? (
+           [1, 2, 3].map((i) => (
+             <div key={i} className="h-64 bg-stone-100 rounded-3xl animate-pulse"></div>
+           ))
+        ) : events.length === 0 ? (
+           <div className="text-center py-20 bg-stone-50 rounded-3xl border border-stone-100">
+             <p className="text-stone-500 text-lg">Nenhum evento agendado no momento.</p>
            </div>
-        </div>
+        ) : (
+          events.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))
+        )}
       </div>
     </div>
   );
@@ -94,11 +73,12 @@ function EventCard({ event }) {
       </div>
 
       {/* Image */}
-      <div className="md:w-2/5 relative overflow-hidden h-48 md:h-auto">
+      <div className="md:w-2/5 relative overflow-hidden h-48 md:h-auto bg-stone-200">
         <img 
-          src={event.image} 
+          src={event.image_url} 
           alt={event.title} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          onError={(e) => e.target.style.display = 'none'} 
         />
         <div className="absolute inset-0 bg-primary-900/10 group-hover:bg-transparent transition-colors"></div>
         
@@ -125,7 +105,7 @@ function EventCard({ event }) {
           {event.title}
         </h3>
         
-        <p className="text-stone-600 leading-relaxed">
+        <p className="text-stone-600 leading-relaxed line-clamp-3">
           {event.description}
         </p>
 
