@@ -1,4 +1,4 @@
-import { ArrowRight, Activity, Users, ShieldCheck, Eye } from "lucide-react";
+import { ArrowRight, Activity, Users, ShieldCheck, Eye, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Home() {
@@ -17,7 +17,9 @@ export default function Home() {
           <p className="text-lg md:text-xl text-primary-100 mb-10 leading-relaxed max-w-2xl">
             A Sociedade Paraense de Oftalmologia conecta você aos especialistas mais qualificados da região, garantindo o mais alto padrão de cuidado com sua visão.
           </p>
-          <div className="flex flex-wrap gap-4">
+          
+          {/* CTA + Social Box */}
+          <div className="flex flex-wrap items-center gap-6">
             <Link 
               to="/directory" 
               className="bg-white text-primary-900 hover:bg-stone-100 rounded-full px-8 py-4 text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center gap-2"
@@ -25,17 +27,22 @@ export default function Home() {
             >
               Encontrar um Médico <ArrowRight className="w-5 h-5" />
             </Link>
-            
-            {/* Instagram Social Link */}
-            <a 
-              href="https://instagram.com/instagram" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 rounded-full px-8 py-4 text-lg font-medium transition-all duration-300 shadow-lg flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-              Siga-nos
-            </a>
+
+            {/* Social Media Highlight Box */}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-1.5 pr-6 flex items-center gap-4 hover:bg-white/15 transition-colors group cursor-pointer">
+               <div className="bg-gradient-to-tr from-purple-500 to-pink-500 p-2.5 rounded-xl shadow-inner group-hover:scale-110 transition-transform">
+                 <Instagram className="w-6 h-6 text-white" />
+               </div>
+               <a 
+                 href="https://instagram.com/instagram" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="flex flex-col"
+               >
+                 <span className="text-xs text-primary-200 font-medium uppercase tracking-wider">Siga-nos</span>
+                 <span className="text-white font-bold text-lg">@instagram</span>
+               </a>
+            </div>
           </div>
         </div>
       </section>
