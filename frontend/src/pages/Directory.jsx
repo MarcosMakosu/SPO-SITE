@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Search, MapPin, Stethoscope, Phone, Mail } from "lucide-react";
+import { Search, MapPin, Stethoscope, Phone, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -97,6 +97,10 @@ export default function Directory() {
 }
 
 function DoctorCard({ doctor }) {
+  // Extract only numbers from contact info for WhatsApp link
+  const cleanPhone = doctor.contact_info?.replace(/\D/g, "");
+  const hasValidPhone = cleanPhone && cleanPhone.length >= 10; // Basic validation
+
   return (
     <div className="group bg-white border border-stone-100 rounded-3xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full" data-testid={`doctor-card-${doctor.id}`}>
       {/* Large Image Section */}
@@ -133,11 +137,23 @@ function DoctorCard({ doctor }) {
           </div>
         </div>
 
-        <div className="mt-auto pt-5 border-t border-stone-100">
-          <div className="flex items-center gap-3 text-sm text-stone-700 font-medium bg-stone-50 p-3 rounded-xl">
+        <div className="mt-auto pt-5 border-t border-stone-100 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-stone-700 font-medium bg-stone-50 px-3 py-2 rounded-xl flex-grow">
             <Phone className="w-4 h-4 text-primary shrink-0" />
-            {doctor.contact_info}
+            <span className="truncate">{doctor.contact_info}</span>
           </div>
+          
+          {hasValidPhone && (
+            <a 
+              href={`https://wa.me/55${cleanPhone}`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-green-50 text-green-600 p-2.5 rounded-xl hover:bg-green-100 hover:text-green-700 transition-colors"
+              title="Conversar no WhatsApp"
+            >
+              <MessageCircle className="w-5 h-5" />
+            </a>
+          )}
         </div>
       </div>
     </div>
