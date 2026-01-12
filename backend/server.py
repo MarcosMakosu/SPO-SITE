@@ -7,16 +7,24 @@ from pathlib import Path
 from typing import List, Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field, ConfigDict
-from sqlalchemy import Column, String, Boolean, DateTime, select, update, delete
+from sqlalchemy import Column, String, Boolean, DateTime, select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base
+
+# Rate Limiting
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 # 1. Setup & Configuration
 ROOT_DIR = Path(__file__).parent
@@ -26,10 +34,10 @@ load_dotenv(ROOT_DIR / '.env')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Security: Load Secret from Env (Critical)
+# Security: Load Secret from Env
 SECRET_KEY = os.environ.get("SECRET_KEY")
-if not SECRET_KEY:
-    logger.warning("SECRET_KEY not set in .env! Generating a temporary one.")
+if not SECRET_KEY or SECRET_KEY == "change_this_in_production_to_a_long_random_string":
+    logger.warning("⚠️  CRITICAL: SECRET_KEY is weak or missing. Using a temporary key.")
     SECRET_KEY = str(uuid.uuid4())
 
 ALGORITHM = "HS256"
@@ -40,7 +48,6 @@ UPLOAD_DIR = os.path.join(ROOT_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # 2. Database Setup (SQLite + SQLAlchemy)
-# Using a file-based SQLite database with absolute path
 DB_PATH = os.path.join(ROOT_DIR, "medassoc.db")
 DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
 
@@ -48,7 +55,10 @@ engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 Base = declarative_base()
 
-# SQLAlchemy Models (The "Tables")
+# Rate Limiter Setup
+limiter = Limiter(key_func=get_remote_address)
+
+# SQLAlchemy Models
 class UserModel(Base):
     __tablename__ = "users"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -86,16 +96,10 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-# 3. Pydantic Models (The "Shapes" for API validation)
+# 3. Pydantic Models
 class Token(BaseModel):
     access_token: str
     token_type: str
-
-class UserSchema(BaseModel):
-    username: str
-    email: Optional[str] = None
-    full_name: Optional[str] = None
-    disabled: Optional[bool] = None
 
 class DoctorCreate(BaseModel):
     name: str
@@ -114,7 +118,6 @@ class DoctorUpdate(BaseModel):
 class DoctorResponse(DoctorCreate):
     id: str
     created_at: datetime
-    
     model_config = ConfigDict(from_attributes=True)
 
 class EventCreate(BaseModel):
@@ -140,7 +143,6 @@ class EventUpdate(BaseModel):
 class EventResponse(EventCreate):
     id: str
     created_at: datetime
-    
     model_config = ConfigDict(from_attributes=True)
 
 # 4. Auth & Security Logic
@@ -177,7 +179,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     except JWTError:
         raise credentials_exception
     
-    # Query DB for user
     result = await db.execute(select(UserModel).where(UserModel.username == username))
     user = result.scalars().first()
     
@@ -185,40 +186,61 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         raise credentials_exception
     return user
 
-# 5. App & Router
+# 5. App & Middleware
 app = FastAPI()
 
-# Mount uploads (Serve static files securely)
-# In production, this would often be handled by Nginx/S3, but fine for standalone.
+# Mount uploads
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
-# Security: CORS Configuration
-# In a real scenario, allow_origins should be specific domains from .env
-origins = os.environ.get("CORS_ORIGINS", "*").split(",")
+# Rate Limit Middleware
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+# Trusted Host (Security Header) - Allowed Hosts
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=["localhost", "127.0.0.1", "*.emergentagent.com", "*.emergent.sh", "medassoc-directory.preview.emergentagent.com"]
+)
+
+# CORS
+origins_raw = os.environ.get("CORS_ORIGINS", "*")
+origins = origins_raw.split(",") if "," in origins_raw else [origins_raw]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], # Restrict methods
+    allow_headers=["Authorization", "Content-Type"], # Restrict headers
 )
+
+# Custom Headers Middleware (X-Frame-Options, X-Content-Type-Options)
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
 
 api_router = APIRouter(prefix="/api")
 
 # --- Routes ---
 
-# Auth
+# Auth - Rate Limited (5 tries per minute)
 @api_router.post("/auth/login", response_model=Token)
+@limiter.limit("5/minute")
 async def login_for_access_token(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db)
 ):
-    # Security: Fetch user securely
     result = await db.execute(select(UserModel).where(UserModel.username == form_data.username))
     user = result.scalars().first()
     
     if not user or not verify_password(form_data.password, user.hashed_password):
-        # Security: Generic error message to prevent enumeration
+        # Generic error message
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -231,20 +253,18 @@ async def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-# Uploads
+# Uploads - Secure extension check
 @api_router.post("/upload")
 async def upload_image(
     file: UploadFile = File(...), 
     current_user: UserModel = Depends(get_current_user)
 ):
     try:
-        # Security: Validate extension
         filename = file.filename
         ext = os.path.splitext(filename)[1].lower()
         if ext not in [".jpg", ".jpeg", ".png", ".webp"]:
-             raise HTTPException(status_code=400, detail="File type not allowed")
+             raise HTTPException(status_code=400, detail="File type not allowed. Use JPG, PNG or WEBP.")
 
-        # Security: Generate random filename to prevent overwrites/traversal
         secure_filename = f"{uuid.uuid4()}{ext}"
         file_path = os.path.join(UPLOAD_DIR, secure_filename)
         
@@ -267,20 +287,14 @@ async def get_doctors(
     limit: int = 100,
     db: AsyncSession = Depends(get_db)
 ):
-    # SQL Query Construction
     query = select(DoctorModel)
-    
     if city:
-        # Security: SQLAlchemy handles escaping automatically
         query = query.where(DoctorModel.city.ilike(f"%{city}%"))
     if specialty:
         query = query.where(DoctorModel.specialty.ilike(f"%{specialty}%"))
-        
     query = query.offset(skip).limit(limit)
-    
     result = await db.execute(query)
-    doctors = result.scalars().all()
-    return doctors
+    return result.scalars().all()
 
 @api_router.post("/doctors", response_model=DoctorResponse, status_code=status.HTTP_201_CREATED)
 async def create_doctor(
@@ -291,12 +305,46 @@ async def create_doctor(
     new_doctor = DoctorModel(**doctor.model_dump())
     db.add(new_doctor)
     await db.commit()
+    await db.refresh(new_doctor)
+    return new_doctor
+
+@api_router.put("/doctors/{doctor_id}", response_model=DoctorResponse)
+async def update_doctor(
+    doctor_id: str, 
+    doctor_update: DoctorUpdate, 
+    current_user: UserModel = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(DoctorModel).where(DoctorModel.id == doctor_id))
+    doctor_db = result.scalars().first()
+    if not doctor_db:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    update_data = doctor_update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(doctor_db, key, value)
+    await db.commit()
+    await db.refresh(doctor_db)
+    return doctor_db
+
+@api_router.delete("/doctors/{doctor_id}")
+async def delete_doctor(
+    doctor_id: str, 
+    current_user: UserModel = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(DoctorModel).where(DoctorModel.id == doctor_id))
+    doctor_db = result.scalars().first()
+    if not doctor_db:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    await db.delete(doctor_db)
+    await db.commit()
+    return {"message": "Doctor deleted successfully"}
+
 # Events (CRUD)
 @api_router.get("/events", response_model=List[EventResponse])
 async def get_events(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(EventModel).order_by(EventModel.created_at.desc()))
-    events = result.scalars().all()
-    return events
+    return result.scalars().all()
 
 @api_router.post("/events", response_model=EventResponse, status_code=status.HTTP_201_CREATED)
 async def create_event(
@@ -319,14 +367,11 @@ async def update_event(
 ):
     result = await db.execute(select(EventModel).where(EventModel.id == event_id))
     event_db = result.scalars().first()
-    
     if not event_db:
         raise HTTPException(status_code=404, detail="Event not found")
-        
     update_data = event_update.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(event_db, key, value)
-        
     await db.commit()
     await db.refresh(event_db)
     return event_db
@@ -339,70 +384,21 @@ async def delete_event(
 ):
     result = await db.execute(select(EventModel).where(EventModel.id == event_id))
     event_db = result.scalars().first()
-    
     if not event_db:
         raise HTTPException(status_code=404, detail="Event not found")
-        
     await db.delete(event_db)
     await db.commit()
     return {"message": "Event deleted successfully"}
 
-    await db.refresh(new_doctor)
-    return new_doctor
-
-@api_router.put("/doctors/{doctor_id}", response_model=DoctorResponse)
-async def update_doctor(
-    doctor_id: str, 
-    doctor_update: DoctorUpdate, 
-    current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    # Check if exists
-    result = await db.execute(select(DoctorModel).where(DoctorModel.id == doctor_id))
-    doctor_db = result.scalars().first()
-    
-    if not doctor_db:
-        raise HTTPException(status_code=404, detail="Doctor not found")
-        
-    update_data = doctor_update.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(doctor_db, key, value)
-        
-    await db.commit()
-    await db.refresh(doctor_db)
-    return doctor_db
-
-@api_router.delete("/doctors/{doctor_id}")
-async def delete_doctor(
-    doctor_id: str, 
-    current_user: UserModel = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    result = await db.execute(select(DoctorModel).where(DoctorModel.id == doctor_id))
-    doctor_db = result.scalars().first()
-    
-    if not doctor_db:
-        raise HTTPException(status_code=404, detail="Doctor not found")
-        
-    await db.delete(doctor_db)
-    await db.commit()
-    return {"message": "Doctor deleted successfully"}
-
-# Include Router
 app.include_router(api_router)
 
-# Startup: Init DB and create Admin
 @app.on_event("startup")
 async def startup_event():
-    # Create tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        
-    # Create Admin
     async with AsyncSessionLocal() as db:
         result = await db.execute(select(UserModel).where(UserModel.username == "admin@medassoc.com"))
         admin = result.scalars().first()
-        
         if not admin:
             hashed_pw = get_password_hash("admin123")
             new_admin = UserModel(
