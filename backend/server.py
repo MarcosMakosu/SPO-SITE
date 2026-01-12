@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional
 
@@ -10,12 +10,11 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Column, String, Boolean, DateTime, select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
@@ -26,28 +25,27 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-# 1. Setup & Configuration
+# --- 1. CONFIGURATION ---
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Security: Load Secret from Env
+# Security Config
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY or SECRET_KEY == "change_this_in_production_to_a_long_random_string":
-    logger.warning("⚠️  CRITICAL: SECRET_KEY is weak or missing. Using a temporary key.")
+    logger.warning("⚠️  SECURITY WARNING: Using default/weak SECRET_KEY. Set a strong key in .env.")
     SECRET_KEY = str(uuid.uuid4())
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Uploads Config
+# File Storage
 UPLOAD_DIR = os.path.join(ROOT_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# 2. Database Setup (SQLite + SQLAlchemy)
+# Database
 DB_PATH = os.path.join(ROOT_DIR, "medassoc.db")
 DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
 
@@ -55,15 +53,13 @@ engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 Base = declarative_base()
 
-# Rate Limiter Setup
 limiter = Limiter(key_func=get_remote_address)
 
-# SQLAlchemy Models
+# --- 2. DATABASE MODELS ---
 class UserModel(Base):
     __tablename__ = "users"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     username = Column(String, unique=True, index=True)
-    email = Column(String)
     full_name = Column(String)
     hashed_password = Column(String)
     disabled = Column(Boolean, default=False)
@@ -91,12 +87,7 @@ class EventModel(Base):
     status = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-# Dependency to get DB session
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
-
-# 3. Pydantic Models
+# --- 3. API SCHEMAS (Pydantic) ---
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -145,7 +136,7 @@ class EventResponse(EventCreate):
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
-# 4. Auth & Security Logic
+# --- 4. SECURITY & AUTH ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -155,18 +146,18 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
-    credentials_exception = HTTPException(
+    auth_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
@@ -175,29 +166,25 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            raise auth_exception
     except JWTError:
-        raise credentials_exception
+        raise auth_exception
     
     result = await db.execute(select(UserModel).where(UserModel.username == username))
     user = result.scalars().first()
-    
     if user is None:
-        raise credentials_exception
+        raise auth_exception
     return user
 
-# 5. App & Middleware
-app = FastAPI()
+# --- 5. APPLICATION SETUP ---
+app = FastAPI(title="S.P.O. API", version="1.0.0")
 
-# Mount uploads
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
-
-# Rate Limit Middleware
+# Middleware Stack
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
-# Trusted Host (Security Header) - Allowed Hosts
+# Trusted Hosts
 app.add_middleware(
     TrustedHostMiddleware, 
     allowed_hosts=["localhost", "127.0.0.1", "*.emergentagent.com", "*.emergent.sh", "medassoc-directory.preview.emergentagent.com"]
@@ -206,18 +193,20 @@ app.add_middleware(
 # CORS
 origins_raw = os.environ.get("CORS_ORIGINS", "*")
 origins = origins_raw.split(",") if "," in origins_raw else [origins_raw]
-
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=origins,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], # Restrict methods
-    allow_headers=["Authorization", "Content-Type"], # Restrict headers
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
-# Custom Headers Middleware (X-Frame-Options, X-Content-Type-Options)
+# Static Files
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+# Security Headers
 @app.middleware("http")
-async def add_security_headers(request: Request, call_next):
+async def security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -226,12 +215,12 @@ async def add_security_headers(request: Request, call_next):
 
 api_router = APIRouter(prefix="/api")
 
-# --- Routes ---
+# --- 6. ENDPOINTS ---
 
-# Auth - Rate Limited (5 tries per minute)
+# Authentication
 @api_router.post("/auth/login", response_model=Token)
 @limiter.limit("5/minute")
-async def login_for_access_token(
+async def login(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db)
@@ -240,50 +229,42 @@ async def login_for_access_token(
     user = result.scalars().first()
     
     if not user or not verify_password(form_data.password, user.hashed_password):
-        # Generic error message
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+    
+    return {"access_token": create_access_token({"sub": user.username}), "token_type": "bearer"}
 
-# Uploads - Secure extension check
+# File Upload
 @api_router.post("/upload")
-async def upload_image(
+async def upload_file(
     file: UploadFile = File(...), 
-    current_user: UserModel = Depends(get_current_user)
+    user: UserModel = Depends(get_current_user)
 ):
-    try:
-        filename = file.filename
-        ext = os.path.splitext(filename)[1].lower()
-        if ext not in [".jpg", ".jpeg", ".png", ".webp"]:
-             raise HTTPException(status_code=400, detail="File type not allowed. Use JPG, PNG or WEBP.")
-
-        secure_filename = f"{uuid.uuid4()}{ext}"
-        file_path = os.path.join(UPLOAD_DIR, secure_filename)
+    ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+    ext = os.path.splitext(file.filename)[1].lower()
+    
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(400, "Invalid file type. Allowed: JPG, PNG, WEBP.")
         
-        with open(file_path, "wb+") as file_object:
-            shutil.copyfileobj(file.file, file_object)
-            
-        return {"url": f"/uploads/{secure_filename}"}
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        logger.error(f"Upload failed: {str(e)}")
-        raise HTTPException(status_code=500, detail="Image upload failed")
+    filename = f"{uuid.uuid4()}{ext}"
+    path = os.path.join(UPLOAD_DIR, filename)
+    
+    try:
+        with open(path, "wb+") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return {"url": f"/uploads/{filename}"}
+    except Exception:
+        raise HTTPException(500, "File upload failed.")
 
-# Doctors (CRUD)
+# Doctors CRUD
 @api_router.get("/doctors", response_model=List[DoctorResponse])
-async def get_doctors(
+async def list_doctors(
     city: Optional[str] = None, 
     specialty: Optional[str] = None,
-    skip: int = 0,
+    skip: int = 0, 
     limit: int = 100,
     db: AsyncSession = Depends(get_db)
 ):
@@ -292,121 +273,123 @@ async def get_doctors(
         query = query.where(DoctorModel.city.ilike(f"%{city}%"))
     if specialty:
         query = query.where(DoctorModel.specialty.ilike(f"%{specialty}%"))
-    query = query.offset(skip).limit(limit)
-    result = await db.execute(query)
+    
+    result = await db.execute(query.offset(skip).limit(limit))
     return result.scalars().all()
 
-@api_router.post("/doctors", response_model=DoctorResponse, status_code=status.HTTP_201_CREATED)
+@api_router.post("/doctors", response_model=DoctorResponse, status_code=201)
 async def create_doctor(
-    doctor: DoctorCreate, 
-    current_user: UserModel = Depends(get_current_user),
+    doc: DoctorCreate, 
+    user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    new_doctor = DoctorModel(**doctor.model_dump())
-    db.add(new_doctor)
+    new_doc = DoctorModel(**doc.model_dump())
+    db.add(new_doc)
     await db.commit()
-    await db.refresh(new_doctor)
-    return new_doctor
+    await db.refresh(new_doc)
+    return new_doc
 
-@api_router.put("/doctors/{doctor_id}", response_model=DoctorResponse)
+@api_router.put("/doctors/{id}", response_model=DoctorResponse)
 async def update_doctor(
-    doctor_id: str, 
-    doctor_update: DoctorUpdate, 
-    current_user: UserModel = Depends(get_current_user),
+    id: str, 
+    doc: DoctorUpdate, 
+    user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(DoctorModel).where(DoctorModel.id == doctor_id))
-    doctor_db = result.scalars().first()
-    if not doctor_db:
-        raise HTTPException(status_code=404, detail="Doctor not found")
-    update_data = doctor_update.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(doctor_db, key, value)
+    result = await db.execute(select(DoctorModel).where(DoctorModel.id == id))
+    existing = result.scalars().first()
+    if not existing:
+        raise HTTPException(404, "Doctor not found")
+        
+    for k, v in doc.model_dump(exclude_unset=True).items():
+        setattr(existing, k, v)
+        
     await db.commit()
-    await db.refresh(doctor_db)
-    return doctor_db
+    await db.refresh(existing)
+    return existing
 
-@api_router.delete("/doctors/{doctor_id}")
+@api_router.delete("/doctors/{id}")
 async def delete_doctor(
-    doctor_id: str, 
-    current_user: UserModel = Depends(get_current_user),
+    id: str, 
+    user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(DoctorModel).where(DoctorModel.id == doctor_id))
-    doctor_db = result.scalars().first()
-    if not doctor_db:
-        raise HTTPException(status_code=404, detail="Doctor not found")
-    await db.delete(doctor_db)
+    result = await db.execute(select(DoctorModel).where(DoctorModel.id == id))
+    existing = result.scalars().first()
+    if not existing:
+        raise HTTPException(404, "Doctor not found")
+    
+    await db.delete(existing)
     await db.commit()
-    return {"message": "Doctor deleted successfully"}
+    return {"message": "Deleted"}
 
-# Events (CRUD)
+# Events CRUD
 @api_router.get("/events", response_model=List[EventResponse])
-async def get_events(db: AsyncSession = Depends(get_db)):
+async def list_events(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(EventModel).order_by(EventModel.created_at.desc()))
     return result.scalars().all()
 
-@api_router.post("/events", response_model=EventResponse, status_code=status.HTTP_201_CREATED)
+@api_router.post("/events", response_model=EventResponse, status_code=201)
 async def create_event(
-    event: EventCreate, 
-    current_user: UserModel = Depends(get_current_user),
+    evt: EventCreate, 
+    user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    new_event = EventModel(**event.model_dump())
-    db.add(new_event)
+    new_evt = EventModel(**evt.model_dump())
+    db.add(new_evt)
     await db.commit()
-    await db.refresh(new_event)
-    return new_event
+    await db.refresh(new_evt)
+    return new_evt
 
-@api_router.put("/events/{event_id}", response_model=EventResponse)
+@api_router.put("/events/{id}", response_model=EventResponse)
 async def update_event(
-    event_id: str, 
-    event_update: EventUpdate, 
-    current_user: UserModel = Depends(get_current_user),
+    id: str, 
+    evt: EventUpdate, 
+    user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(EventModel).where(EventModel.id == event_id))
-    event_db = result.scalars().first()
-    if not event_db:
-        raise HTTPException(status_code=404, detail="Event not found")
-    update_data = event_update.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(event_db, key, value)
+    result = await db.execute(select(EventModel).where(EventModel.id == id))
+    existing = result.scalars().first()
+    if not existing:
+        raise HTTPException(404, "Event not found")
+        
+    for k, v in evt.model_dump(exclude_unset=True).items():
+        setattr(existing, k, v)
+        
     await db.commit()
-    await db.refresh(event_db)
-    return event_db
+    await db.refresh(existing)
+    return existing
 
-@api_router.delete("/events/{event_id}")
+@api_router.delete("/events/{id}")
 async def delete_event(
-    event_id: str, 
-    current_user: UserModel = Depends(get_current_user),
+    id: str, 
+    user: UserModel = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(EventModel).where(EventModel.id == event_id))
-    event_db = result.scalars().first()
-    if not event_db:
-        raise HTTPException(status_code=404, detail="Event not found")
-    await db.delete(event_db)
+    result = await db.execute(select(EventModel).where(EventModel.id == id))
+    existing = result.scalars().first()
+    if not existing:
+        raise HTTPException(404, "Event not found")
+    
+    await db.delete(existing)
     await db.commit()
-    return {"message": "Event deleted successfully"}
+    return {"message": "Deleted"}
 
 app.include_router(api_router)
 
 @app.on_event("startup")
-async def startup_event():
+async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    async with AsyncSessionLocal() as db:
-        result = await db.execute(select(UserModel).where(UserModel.username == "admin@medassoc.com"))
-        admin = result.scalars().first()
-        if not admin:
-            hashed_pw = get_password_hash("admin123")
-            new_admin = UserModel(
+        
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(UserModel).where(UserModel.username == "admin@medassoc.com"))
+        if not result.scalars().first():
+            admin = UserModel(
                 username="admin@medassoc.com",
-                email="admin@medassoc.com",
-                full_name="System Administrator",
-                hashed_password=hashed_pw
+                full_name="Admin",
+                hashed_password=get_password_hash("admin123")
             )
-            db.add(new_admin)
-            await db.commit()
-            logger.info("Created default admin user (SQLite)")
+            session.add(admin)
+            await session.commit()
+            logger.info("Admin user created")
