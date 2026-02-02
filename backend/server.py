@@ -205,6 +205,17 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    # Security Headers - Relaxed for Preview/Frame
+    # response.headers["X-Frame-Options"] = "SAMEORIGIN" 
+    # Removed DENY to allow preview in iframe
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
+
 # API Router
 api_router = APIRouter(prefix="/api")
 
