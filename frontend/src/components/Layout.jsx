@@ -140,9 +140,12 @@ export default function Layout() {
             <div className="text-xs flex flex-wrap justify-center md:justify-end gap-x-1.5 items-center">
               <span>Site feito por</span>
               <a href="https://github.com/marcosmakosu" target="_blank" rel="noreferrer" className="hover:text-primary font-medium transition-colors">Marcos Makosu</a>
-              <span>(<a href="mailto:marcosmakosu@gmail.com" className="hover:text-primary transition-colors">Contato</a>)</span>
-              <span>&</span>
+              <span>(<a href="mailto:marcosmakosu@gmail.com" className="hover:text-primary transition-colors">Contato</a>),</span>
               <a href="https://github.com/pablosilva" target="_blank" rel="noreferrer" className="hover:text-primary font-medium transition-colors">Pablo Silva</a>
+              <span>(<a href="mailto:ph501010c@gmail.com" className="hover:text-primary transition-colors">Contato</a>)</span>
+              <span>&</span>
+              <span className="font-medium hover:text-primary transition-colors cursor-default">Agencia Quasar Midia</span>
+              <span>(<a href="mailto:agenciaquasarmedia@gmail.com" className="hover:text-primary transition-colors">Contato</a>)</span>
             </div>
           </div>
         </div>
