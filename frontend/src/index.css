@@ -47,8 +47,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-secondary text-foreground antialiased;
+    @apply text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-image: url('https://customer-assets.emergentagent.com/job_6e125dd0-724d-42ad-90c4-2b3d56d9357e/artifacts/cigbvfjj_40%20Sem%20T%C3%ADtulo_20260206191423.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif text-primary-900;
