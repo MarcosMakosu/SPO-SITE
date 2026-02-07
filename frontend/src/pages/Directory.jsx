@@ -1,38 +1,99 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { Search, MapPin, Stethoscope, Phone, MessageCircle } from "lucide-react";
-import { toast } from "sonner";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// Hardcoded doctors data
+const INITIAL_DOCTORS = [
+    {
+        id: "1",
+        name: "Robson Seiji T. Koyama",
+        city: "Belém",
+        specialty: "Presidente",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/vp67eno7_WhatsApp%20Image%202026-01-22%20at%2009.35.13.jpeg"
+    },
+    {
+        id: "2",
+        name: "Filipe Moreira de Araújo",
+        city: "Belém",
+        specialty: "Conselheiro Fiscal Suplente",
+        contact_info: "", 
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/ywr9fmpn_WhatsApp%20Image%202025-12-23%20at%2013.23.32.jpeg"
+    },
+    {
+        id: "3",
+        name: "Thaís Sousa Mendes",
+        city: "Belém",
+        specialty: "Diretoria da SPO",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/gsh1x86w_image.png"
+    },
+    {
+        id: "4",
+        name: "Alexandre Antônio Marques Rosa",
+        city: "Belém",
+        specialty: "Vice -presidente",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/zqgc9gb2_WhatsApp%20Image%202025-12-23%20at%2013.23.32%20%281%29.jpeg"
+    },
+    {
+        id: "5",
+        name: "José Ricardo Mouta Araújo",
+        city: "Belém",
+        specialty: "Membro",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/86mvenb5_WhatsApp%20Image%202025-12-23%20at%2013.23.32%20%282%29.jpeg"
+    },
+    {
+        id: "6",
+        name: "Thiago Sopper Boti",
+        city: "Belém",
+        specialty: "Diretor Financeiro",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/46bj9e0p_WhatsApp%20Image%202025-12-23%20at%2013.23.32%20%283%29.jpeg"
+    },
+    {
+        id: "7",
+        name: "Augusto César Costa de Almeida",
+        city: "Belém",
+        specialty: "Conselho Fiscal",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/g99n4wa1_WhatsApp%20Image%202025-12-23%20at%2013.24.00.jpeg"
+    },
+    {
+        id: "8",
+        name: "Márcia Silva Ferreira",
+        city: "Belém",
+        specialty: "Diretoria SPO",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/zs19ws0p_WhatsApp%20Image%202025-12-23%20at%2013.47.04.jpeg"
+    },
+    {
+        id: "9",
+        name: "Etiene França",
+        city: "Belém",
+        specialty: "Diretora de Marketing SPO",
+        contact_info: "",
+        image_url: "https://customer-assets.emergentagent.com/job_spo-medical/artifacts/k09l61li_teste1.jpeg"
+    }
+];
 
 export default function Directory() {
-  const [doctors, setDoctors] = useState([]);
+  const [doctors, setDoctors] = useState(INITIAL_DOCTORS);
   const [cityFilter, setCityFilter] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const fetchDoctors = async (city = "") => {
-    setLoading(true);
-    try {
-      const params = {};
-      if (city) params.city = city;
-      
-      const response = await axios.get(`${BACKEND_URL}/api/doctors`, { params });
-      setDoctors(response.data);
-    } catch (error) {
-      console.error("Error fetching doctors:", error);
-      toast.error("Erro ao carregar diretório");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDoctors();
-  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchDoctors(cityFilter);
+    if (!cityFilter.trim()) {
+        setDoctors(INITIAL_DOCTORS);
+        return;
+    }
+    
+    const filtered = INITIAL_DOCTORS.filter(doc => 
+        doc.city.toLowerCase().includes(cityFilter.toLowerCase()) ||
+        doc.name.toLowerCase().includes(cityFilter.toLowerCase()) ||
+        doc.specialty.toLowerCase().includes(cityFilter.toLowerCase())
+    );
+    setDoctors(filtered);
   };
 
   return (
@@ -52,7 +113,7 @@ export default function Directory() {
           </div>
           <input
             type="text"
-            placeholder="Buscar por cidade (ex: Belém)"
+            placeholder="Buscar por nome, especialidade ou cidade"
             className="block w-full pl-12 pr-32 py-4 bg-white border border-stone-200 rounded-full text-lg shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-stone-400"
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
@@ -69,17 +130,11 @@ export default function Directory() {
       </div>
 
       {/* Results Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-96 bg-stone-100 rounded-2xl animate-pulse"></div>
-          ))}
-        </div>
-      ) : doctors.length === 0 ? (
+      {doctors.length === 0 ? (
         <div className="text-center py-20 bg-stone-50 rounded-3xl border border-stone-100">
           <p className="text-stone-500 text-lg">Nenhum médico encontrado com estes critérios.</p>
           <button 
-            onClick={() => {setCityFilter(""); fetchDoctors("");}}
+            onClick={() => {setCityFilter(""); setDoctors(INITIAL_DOCTORS);}}
             className="mt-4 text-primary font-medium hover:underline"
           >
             Limpar filtros
@@ -138,10 +193,14 @@ function DoctorCard({ doctor }) {
         </div>
 
         <div className="mt-auto pt-5 border-t border-stone-100 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm text-stone-700 font-medium bg-stone-50 px-3 py-2 rounded-xl flex-grow">
-            <Phone className="w-4 h-4 text-primary shrink-0" />
-            <span className="truncate">{doctor.contact_info}</span>
-          </div>
+          {doctor.contact_info ? (
+             <div className="flex items-center gap-2 text-sm text-stone-700 font-medium bg-stone-50 px-3 py-2 rounded-xl flex-grow">
+               <Phone className="w-4 h-4 text-primary shrink-0" />
+               <span className="truncate">{doctor.contact_info}</span>
+             </div>
+          ) : (
+            <div className="flex-grow"></div>
+          )}
           
           {hasValidPhone && (
             <a 
