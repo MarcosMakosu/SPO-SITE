@@ -1,7 +1,7 @@
 # ===============================
-# Build Frontend
+# Stage 1: Build Frontend
 # ===============================
-FROM node:18-alpine as frontend-build
+FROM node:18-alpine AS frontend-build
 
 WORKDIR /app/frontend
 
@@ -13,7 +13,7 @@ ENV REACT_APP_BACKEND_URL=/api
 RUN npm run build
 
 # ===============================
-# Backend
+# Stage 2: Backend (Final Image)
 # ===============================
 FROM python:3.11-slim
 
@@ -36,12 +36,12 @@ COPY scripts/ ./scripts
 # Frontend buildado
 COPY --from=frontend-build /app/frontend/build ./frontend/build
 
+# Ambiente
 ENV PYTHONPATH=/app
 ENV SECRET_KEY=changeme_in_production
 
-# Render usa essa porta
-ENV PORT=10000
-
+# A Render define essa variável
 EXPOSE 10000
 
+# Start
 CMD ["sh", "-c", "python scripts/seed_doctors.py && gunicorn backend.server:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT"]
