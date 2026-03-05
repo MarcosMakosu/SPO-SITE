@@ -56,7 +56,7 @@ export default function Home() {
           <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
             <div className="h-48 overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&q=80&w=800" 
+                src="https://images.unsplash.com/photo-1539036776273-021ec1d78bec?auto=format&fit=crop&q=80&w=800" 
                 alt="Miopia" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -73,7 +73,7 @@ export default function Home() {
           <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
             <div className="h-48 overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1509909756405-be0199881695?auto=format&fit=crop&q=80&w=800" 
+                src="https://images.unsplash.com/photo-1663151064065-cb334788f77d?auto=format&fit=crop&q=80&w=800" 
                 alt="Presbiopia" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -90,7 +90,7 @@ export default function Home() {
           <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
             <div className="h-48 overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1580281657527-47f249e8f4df?auto=format&fit=crop&q=80&w=800" 
+                src="https://images.unsplash.com/photo-1617651482504-4b0d8bf23ba0?auto=format&fit=crop&q=80&w=800" 
                 alt="Catarata" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -107,7 +107,7 @@ export default function Home() {
           <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
             <div className="h-48 overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1579684385180-1ea55f6196e0?auto=format&fit=crop&q=80&w=800" 
+                src="https://images.unsplash.com/photo-1576210117723-cd06449a467d?auto=format&fit=crop&q=80&w=800" 
                 alt="Conjuntivite" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
