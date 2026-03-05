@@ -103,7 +103,7 @@ export default function Home() {
           {/* Card 4: Conjuntivite */}
           <div className="relative rounded-2xl overflow-hidden h-64 group shadow-md hover:shadow-xl transition-all duration-300">
             <img 
-              src="https://images.unsplash.com/photo-1576210117723-cd06449a467d?auto=format&fit=crop&q=80&w=800" 
+              src="https://customer-assets.emergentagent.com/job_spo-medical/artifacts/t2gms0vi_image.png" 
               alt="Conjuntivite" 
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
