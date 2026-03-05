@@ -53,68 +53,64 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
           {/* Card 1: Miopia */}
-          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-            <div className="h-48 overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1539036776273-021ec1d78bec?auto=format&fit=crop&q=80&w=800" 
-                alt="Miopia" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-6">
-              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Miopia</h3>
-              <p className="text-stone-600 text-sm leading-relaxed">
+          <div className="relative rounded-2xl overflow-hidden h-64 group shadow-md hover:shadow-xl transition-all duration-300">
+            <img 
+              src="https://images.unsplash.com/photo-1539036776273-021ec1d78bec?auto=format&fit=crop&q=80&w=800" 
+              alt="Miopia" 
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
+            <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+              <h3 className="font-serif text-2xl font-bold mb-2">Miopia</h3>
+              <p className="text-white/90 text-sm leading-relaxed">
                 Dificuldade para enxergar objetos distantes, pois a imagem se forma antes da retina.
               </p>
             </div>
           </div>
 
           {/* Card 2: Presbiopia */}
-          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-            <div className="h-48 overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1663151064065-cb334788f77d?auto=format&fit=crop&q=80&w=800" 
-                alt="Presbiopia" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-6">
-              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Presbiopia</h3>
-              <p className="text-stone-600 text-sm leading-relaxed">
+          <div className="relative rounded-2xl overflow-hidden h-64 group shadow-md hover:shadow-xl transition-all duration-300">
+            <img 
+              src="https://images.unsplash.com/photo-1663151064065-cb334788f77d?auto=format&fit=crop&q=80&w=800" 
+              alt="Presbiopia" 
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
+            <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+              <h3 className="font-serif text-2xl font-bold mb-2">Presbiopia</h3>
+              <p className="text-white/90 text-sm leading-relaxed">
                 Perda natural da capacidade de focar de perto com a idade, comum após os 40 anos.
               </p>
             </div>
           </div>
 
           {/* Card 3: Catarata */}
-          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-            <div className="h-48 overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1617651482504-4b0d8bf23ba0?auto=format&fit=crop&q=80&w=800" 
-                alt="Catarata" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-6">
-              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Catarata</h3>
-              <p className="text-stone-600 text-sm leading-relaxed">
+          <div className="relative rounded-2xl overflow-hidden h-64 group shadow-md hover:shadow-xl transition-all duration-300">
+            <img 
+              src="https://images.unsplash.com/photo-1617651482504-4b0d8bf23ba0?auto=format&fit=crop&q=80&w=800" 
+              alt="Catarata" 
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
+            <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+              <h3 className="font-serif text-2xl font-bold mb-2">Catarata</h3>
+              <p className="text-white/90 text-sm leading-relaxed">
                 Opacificação do cristalino do olho, deixando a visão turva ou nublada.
               </p>
             </div>
           </div>
 
           {/* Card 4: Conjuntivite */}
-          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
-            <div className="h-48 overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1576210117723-cd06449a467d?auto=format&fit=crop&q=80&w=800" 
-                alt="Conjuntivite" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-6">
-              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Conjuntivite</h3>
-              <p className="text-stone-600 text-sm leading-relaxed">
+          <div className="relative rounded-2xl overflow-hidden h-64 group shadow-md hover:shadow-xl transition-all duration-300">
+            <img 
+              src="https://images.unsplash.com/photo-1576210117723-cd06449a467d?auto=format&fit=crop&q=80&w=800" 
+              alt="Conjuntivite" 
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
+            <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+              <h3 className="font-serif text-2xl font-bold mb-2">Conjuntivite</h3>
+              <p className="text-white/90 text-sm leading-relaxed">
                 Inflamação da conjuntiva, causando olhos vermelhos, coceira e secreção.
               </p>
             </div>
