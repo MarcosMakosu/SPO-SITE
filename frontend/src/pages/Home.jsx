@@ -47,6 +47,82 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Common Eye Conditions Section */}
+      <section className="bg-white rounded-3xl p-8 md:p-12 border border-stone-100 shadow-sm">
+        <h2 className="font-serif text-3xl md:text-4xl text-primary-900 mb-10 text-center">Principais Condições Oculares</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          {/* Card 1: Miopia */}
+          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+            <div className="h-48 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&q=80&w=800" 
+                alt="Miopia" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-6">
+              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Miopia</h3>
+              <p className="text-stone-600 text-sm leading-relaxed">
+                Dificuldade para enxergar objetos distantes, pois a imagem se forma antes da retina.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2: Presbiopia */}
+          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+            <div className="h-48 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1509909756405-be0199881695?auto=format&fit=crop&q=80&w=800" 
+                alt="Presbiopia" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-6">
+              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Presbiopia</h3>
+              <p className="text-stone-600 text-sm leading-relaxed">
+                Perda natural da capacidade de focar de perto com a idade, comum após os 40 anos.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3: Catarata */}
+          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+            <div className="h-48 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1580281657527-47f249e8f4df?auto=format&fit=crop&q=80&w=800" 
+                alt="Catarata" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-6">
+              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Catarata</h3>
+              <p className="text-stone-600 text-sm leading-relaxed">
+                Opacificação do cristalino do olho, deixando a visão turva ou nublada.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 4: Conjuntivite */}
+          <div className="bg-stone-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+            <div className="h-48 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1579684385180-1ea55f6196e0?auto=format&fit=crop&q=80&w=800" 
+                alt="Conjuntivite" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-6">
+              <h3 className="font-serif text-xl font-bold text-primary-900 mb-3">Conjuntivite</h3>
+              <p className="text-stone-600 text-sm leading-relaxed">
+                Inflamação da conjuntiva, causando olhos vermelhos, coceira e secreção.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       {/* President's Message (Moved from About) */}
       <section className="bg-stone-50 rounded-3xl p-8 md:p-12 border border-stone-100">
         <div className="flex flex-col md:flex-row gap-10 items-start">
