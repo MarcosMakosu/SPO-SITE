@@ -71,7 +71,7 @@ export default function Home() {
           {/* Card 2: Presbiopia */}
           <div className="relative rounded-2xl overflow-hidden h-64 group shadow-md hover:shadow-xl transition-all duration-300">
             <img 
-              src="https://images.unsplash.com/photo-1663151064065-cb334788f77d?auto=format&fit=crop&q=80&w=800" 
+              src="https://customer-assets.emergentagent.com/job_spo-medical/artifacts/4i5xpnr0_image.png" 
               alt="Presbiopia" 
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
