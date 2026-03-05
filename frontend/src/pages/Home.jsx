@@ -61,7 +61,7 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
             <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-              <h3 className="font-serif text-2xl font-bold mb-2">Miopia</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-white">Miopia</h3>
               <p className="text-white/90 text-sm leading-relaxed">
                 Dificuldade para enxergar objetos distantes, pois a imagem se forma antes da retina.
               </p>
@@ -77,7 +77,7 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
             <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-              <h3 className="font-serif text-2xl font-bold mb-2">Presbiopia</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-white">Presbiopia</h3>
               <p className="text-white/90 text-sm leading-relaxed">
                 Perda natural da capacidade de focar de perto com a idade, comum após os 40 anos.
               </p>
@@ -93,7 +93,7 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
             <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-              <h3 className="font-serif text-2xl font-bold mb-2">Catarata</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-white">Catarata</h3>
               <p className="text-white/90 text-sm leading-relaxed">
                 Opacificação do cristalino do olho, deixando a visão turva ou nublada.
               </p>
@@ -109,7 +109,7 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 group-hover:from-black/95 transition-colors duration-300"></div>
             <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-              <h3 className="font-serif text-2xl font-bold mb-2">Conjuntivite</h3>
+              <h3 className="font-serif text-2xl font-bold mb-2 text-white">Conjuntivite</h3>
               <p className="text-white/90 text-sm leading-relaxed">
                 Inflamação da conjuntiva, causando olhos vermelhos, coceira e secreção.
               </p>
