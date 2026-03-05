@@ -87,7 +87,7 @@ export default function Home() {
           {/* Card 3: Catarata */}
           <div className="relative rounded-2xl overflow-hidden h-64 group shadow-md hover:shadow-xl transition-all duration-300">
             <img 
-              src="https://images.unsplash.com/photo-1617651482504-4b0d8bf23ba0?auto=format&fit=crop&q=80&w=800" 
+              src="https://customer-assets.emergentagent.com/job_spo-medical/artifacts/7woh1a4n_image.png" 
               alt="Catarata" 
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
